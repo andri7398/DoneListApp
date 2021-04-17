@@ -1,6 +1,9 @@
 package com.example.donelistapp;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView hello, done;
     private EditText nama, email, password;
     UserLocalStore userLocalStore;
+    DBHelper helper = new DBHelper(this,null,null,1);
+
 
     private static String list = "";
     public static String getlist() {
@@ -39,13 +44,11 @@ public class MainActivity extends AppCompatActivity {
         nama = findViewById(R.id.nama);
         add = findViewById(R.id.add_button);
 
-
         //logout = findViewById(R.id.logout_button);
         hello = findViewById(R.id.hello_text);
         done = findViewById(R.id.done_text);
 
         list = done.getText().toString().trim();
-        Log.e("list",list);
 
         hello.setText("Hello " + DaftarActivity.getValue());
 
@@ -56,13 +59,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(done.getText().toString().equals(null)){
-            Log.e("asd","masuk");
-            done.setText(MainActivity.getlist()+ "\n"+DoneActivity.getValue());
+        SQLiteDatabase db = openOrCreateDatabase("ACTIVTITY_LIST",MODE_PRIVATE,null);
+        Cursor result = db.rawQuery("SELECT ACTIVITY FROM ACTIVITY_LIST ORDER BY ASCENDING", null);
+
+        String activities = "";
+
+        for(int i = 0; i<result.getCount(); i++){
+            activities = activities+ result.getString(i)+"\n";
         }
-        else{
-            done.setText(done.getText() +"\n" + DoneActivity.getValue());
-        }
+
+        done.setText(activities);
 
 
 //        logout.setOnClickListener(new View.OnClickListener() {
